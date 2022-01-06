@@ -4,6 +4,7 @@
  */
 
 #include <iostream>
+#include <conio.h>
 #include <string>
 #include "hangmanheader.h"
 
@@ -22,7 +23,16 @@ int main()
     totalGuesses = 0;
 
     std::cout << "Please enter a word: ";
-    std::cin >> hangmanword;
+    char l;
+    while (l = _getch())
+    {
+        if (l == 13)
+        {
+            break;
+        }
+        hangmanword = hangmanword + l;
+        std::cout << "*";
+    }
     std::cout << "\n";
 
     while (components > 0)
@@ -30,6 +40,8 @@ int main()
         printHangman(components);
 
         std::cout << "Please enter a letter: ";
+
+
         std::cin >> currentGuess;
         std::cout << "\n";
 
