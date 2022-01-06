@@ -11,6 +11,7 @@
 void validateGuess(char, std::string);
 void printLetters(std::string);
 void printHangman(int);
+void printGuesses(void);
 
 char allGuesses[26];
 int totalGuesses, correctGuesses;
@@ -43,6 +44,7 @@ int main()
     {
         printHangman(components);
         printLetters(hangmanword);
+        printGuesses();
 
         std::cout << "Please enter a letter: ";
 
@@ -130,6 +132,21 @@ void printLetters(std::string hangmanword)
         std::cout << "_" << "  ";
     }
     std::cout << "\n\n";
+}
+
+
+/* prints all of the letters the player has entered so far */
+/* TODO: do not print , at the end */
+void printGuesses()
+{
+    int i = 0;
+    std::cout << "Letters guessed: ";
+
+    for (int i = 0; i < totalGuesses; i++)
+    {
+        std::cout << allGuesses[i] << ", ";
+    }
+    std::cout << "\n";
 }
 
 void printHangman(int wrongGuesses)
