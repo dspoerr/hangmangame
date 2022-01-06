@@ -147,7 +147,6 @@ void printLetters(std::string hangmanword)
 
 
 /* prints all of the letters the player has entered so far */
-/* TODO: do not print , at the end */
 void printGuesses()
 {
     int i = 0;
@@ -155,7 +154,12 @@ void printGuesses()
 
     for (int i = 0; i < totalGuesses; i++)
     {
-        std::cout << allGuesses[i] << ", ";
+        std::cout << allGuesses[i];
+
+        if (i < (totalGuesses - 1))
+        {
+            std::cout << ",";
+        }
     }
     std::cout << "\n";
 }
