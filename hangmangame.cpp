@@ -1,5 +1,6 @@
 /*
  * This is a short program to make a console version of hangman with a visual element.
+ * Case sensitive. 
  */
 
 #include <iostream>
@@ -10,13 +11,13 @@ void validateGuess(char, std::string);
 void printHangman(int);
 
 char allGuesses[26];
-int totalGuesses;
+int totalGuesses, correctGuesses;
+int components;
 
 int main()
 {
     std::string hangmanword;
     int components = 10;
-    int wrongGuesses = 0;
     char currentGuess;
     totalGuesses = 0;
 
@@ -26,7 +27,7 @@ int main()
 
     while (components > 0)
     {
-        printHangman(wrongGuesses);
+        printHangman(components);
 
         std::cout << "Please enter a letter: ";
         std::cin >> currentGuess;
@@ -34,6 +35,12 @@ int main()
 
 
         validateGuess(currentGuess, hangmanword);
+
+        if (correctGuesses == hangmanword.length())
+        {
+            std::cout << "Winner!\n";
+            return 0;
+        }
     }
 
     return 0;
@@ -41,19 +48,28 @@ int main()
 
 void validateGuess(char currentGuess, std::string hangmanword)
 {
+    bool isCorrect = false;
     /* check if player has already guessed this letter */
     for (int i = 0; i < totalGuesses; i++)
     {
-        std::cout << "IN LOOP!\n";
         if (currentGuess == allGuesses[i])
         {
             std::cout << "You already guessed this letter! Try again.\n";
             return;
         }
     }
-    std::cout << "HERE!\n";
     allGuesses[totalGuesses] = currentGuess;
     totalGuesses++;
+
+    for (auto& letter : hangmanword)
+    {
+        if (currentGuess == letter)
+        {
+            isCorrect = true;
+            correctGuesses++;
+            std::cout << "Total correct guesses: " << correctGuesses << "\n";
+        }
+    }
 
 }
 
