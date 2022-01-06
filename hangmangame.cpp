@@ -17,7 +17,7 @@ int components;
 int main()
 {
     std::string hangmanword;
-    int components = 10;
+    components = 10;
     char currentGuess;
     totalGuesses = 0;
 
@@ -43,6 +43,7 @@ int main()
         }
     }
 
+    std::cout << "You lost!\n";
     return 0;
 }
 
@@ -69,6 +70,11 @@ void validateGuess(char currentGuess, std::string hangmanword)
             correctGuesses++;
             std::cout << "Total correct guesses: " << correctGuesses << "\n";
         }
+    }
+
+    if (!isCorrect)
+    {
+        components--;
     }
 
 }
