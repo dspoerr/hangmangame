@@ -27,7 +27,6 @@ int main()
 
     std::cout << "Please enter a word (max 26 letters): ";
     char l;
-    /* TODO: add a catch for a user backspacing */
     while (l = _getch())
     {
         /* checking for user to hit enter (ASCII value 13) */
@@ -35,8 +34,22 @@ int main()
         {
             break;
         }
-        hangmanword = hangmanword + l;
-        std::cout << "*";
+
+        /* checking for backspace */
+        if (l == 8)
+        {
+            std::cout << "\nCannot undo! Please retype the full word: ";
+            hangmanword = "";
+            continue;
+        }
+
+        /* ensuring user has entered a lower case letter */
+        if (l >= 97 && l <= 122)
+        {
+            hangmanword = hangmanword + l;
+            std::cout << "*";
+        }
+
     }
     std::cout << "\n";
 
@@ -67,8 +80,6 @@ int main()
 }
 
 /* validates whether the player guessed a correct or valid letter */
-/* TODO: catch non-alphabet letters */
-/* TODO: ignore case */
 void validateGuess(char currentGuess, std::string hangmanword)
 {
     bool isCorrect = false;
