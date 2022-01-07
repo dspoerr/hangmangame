@@ -12,6 +12,7 @@ void validateGuess(char, std::string);
 void printLetters(std::string);
 void printHangman(int);
 void printGuesses(void);
+void hangmanheader_init(void);
 
 char allGuesses[26];
 int totalGuesses, correctGuesses;
@@ -20,6 +21,8 @@ bool lettersGuessed[26];
 
 int main()
 {
+    hangmanheader_init();
+
     std::string hangmanword;
     components = 10;
     char currentGuess;
@@ -53,8 +56,9 @@ int main()
     }
     std::cout << "\n";
 
-    while (components > 0)
+    while (components > 1)
     {
+        std::cout << "\n\n====================\n";
         printHangman(components);
         printLetters(hangmanword);
         printGuesses();
@@ -73,9 +77,11 @@ int main()
             printLetters(hangmanword);
             return 0;
         }
+        std::cout << "====================\n";
     }
 
-    std::cout << "You lost!\n";
+    std::cout << "\n\n\nYou lost!\n";
+    printHangman(components);
     return 0;
 }
 
@@ -88,7 +94,9 @@ void validateGuess(char currentGuess, std::string hangmanword)
     {
         if (currentGuess == allGuesses[i])
         {
-            std::cout << "You already guessed this letter! Try again.\n";
+            std::cout << "You already guessed this letter! Try again: ";
+            std::cin >> currentGuess;
+            validateGuess(currentGuess, hangmanword);
             return;
         }
     }
@@ -104,8 +112,7 @@ void validateGuess(char currentGuess, std::string hangmanword)
         {
             lettersGuessed[j] = true; /* used for printLetters() */
             isCorrect = true; 
-            correctGuesses++;
-            std::cout << "Total correct guesses: " << correctGuesses << "\n";
+            correctGuesses++; /* determines whether the entire word has been guessed */
         }
         j++;
     }
@@ -166,29 +173,38 @@ void printGuesses()
 
 void printHangman(int wrongGuesses)
 {
-    switch (wrongGuesses)
+    /* TODO: clean up the logic here */
+    int i = 1;
+    std::cout << "Mistakes remaining: " << wrongGuesses - 1 << "\n";
+
+    for (auto& art : hangmanArt)
     {
-    case 0:
-        break;
-    case 1:
-        break;
-    case 2:
-        break;
-    case 3:
-        break;
-    case 4:
-        break;
-    case 5:
-        break;
-    case 6:
-        break;
-    case 7:
-        break;
-    case 8:
-        break;
-    case 9:
-        break;
-    case 10:
-        break;
+        if (wrongGuesses == 0)
+        {
+            art.print();
+            return;
+        }
+        if (i == wrongGuesses)
+        {
+            art.print();
+            return;
+        }
+        i++;
     }
+
+
+}
+
+void hangmanheader_init()
+{
+    hangmanArt.push_back(hangman_ten);
+    hangmanArt.push_back(hangman_nine);
+    hangmanArt.push_back(hangman_eight);
+    hangmanArt.push_back(hangman_seven);
+    hangmanArt.push_back(hangman_six);
+    hangmanArt.push_back(hangman_five);
+    hangmanArt.push_back(hangman_four);
+    hangmanArt.push_back(hangman_three);
+    hangmanArt.push_back(hangman_two);
+    hangmanArt.push_back(hangman_one);
 }
