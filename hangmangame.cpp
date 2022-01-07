@@ -19,6 +19,7 @@ int main()
 {
     std::string hangmanword;
     char currentGuess = ' ';
+    score = 0;
 
     hangmanheader_init();
     hangmanword = gameReset();
@@ -79,6 +80,8 @@ int main()
             {
                 hangmanword = gameReset();
             }
+
+            score = 0;
         }
     }
     return 0;
@@ -113,6 +116,7 @@ void validateGuess(char currentGuess, std::string hangmanword)
             posOfCorrectGuesses[j] = true; /* used for printLetters() */
             isCorrect = true; 
             correctGuesses++; /* determines whether the entire word has been guessed */
+            score += ((float)(26 - hangmanword.length()) * (float)difficulty);
         }
         j++;
     }
@@ -139,7 +143,7 @@ void printLetters(std::string hangmanword)
         }
         else
         {
-            std::cout << "X" << "  ";
+            std::cout << "?" << "  ";
         }
         j++;
     }
@@ -177,6 +181,7 @@ void printHangman(int wrongGuesses)
     /* TODO: clean up the logic here */
     int i = 1;
     std::cout << "Mistakes remaining: " << (wrongGuesses - 1)/difficulty << "\n";
+    std::cout << "Current score: " << score << "\n";
 
     for (auto& art : hangmanArt)
     {

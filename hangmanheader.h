@@ -20,6 +20,7 @@ int totalGuesses, correctGuesses;
 int components;
 int difficulty;
 bool posOfCorrectGuesses[26];
+float score;
 
 
 struct hangmanASCII
