@@ -11,12 +11,15 @@
 #include "hangmanheader.h"
 #include <random>
 #include <fstream>
+#include <algorithm>
 
 void validateGuess(char, std::string);
 void printLetters(std::string);
 void printHangman(int);
 void printGuesses(void);
 void hangmanheader_init(void);
+std::string gameReset(void);
+std::string getWord(void);
 std::string findInFile(int index);
 
 char allGuesses[26];
@@ -25,69 +28,14 @@ int components;
 bool lettersGuessed[26];
 
 
-/* TODO: add play again */
 int main()
 {
     hangmanheader_init();
 
     std::string hangmanword;
-    components = 10;
     char currentGuess = ' ';
-    totalGuesses = 0;
     
-    while (currentGuess != 'y' && currentGuess != 'n')
-    {
-        std::cout << "Play against randomly generated word? (y/n): ";
-        std::cin >> currentGuess;
-        std::cout << "\n";
-    }
-    
-    /* randomly generated word */
-    if (currentGuess == 'y')
-    {
-        std::random_device dev;
-        std::mt19937 rng(dev());
-        std::uniform_int_distribution<std::mt19937::result_type> distW(1, 370103);
-
-        hangmanword = findInFile(distW(rng));
-
-        if (hangmanword == "")
-        {
-            std::cout << "File error! Whoopsie.\n";
-            return 0;
-        }
-    }
-    /* manually entering a word */
-    else
-    {
-        std::cout << "Please enter a word (max 26 letters): ";
-        char l;
-        while (l = _getch())
-        {
-            /* checking for user to hit enter (ASCII value 13) */
-            if (l == 13)
-            {
-                break;
-            }
-
-            /* checking for backspace */
-            if (l == 8)
-            {
-                std::cout << "\nCannot undo! Please retype the full word: ";
-                hangmanword = "";
-                continue;
-            }
-
-            /* ensuring user has entered a lower case letter */
-            if (l >= 97 && l <= 122)
-            {
-                hangmanword = hangmanword + l;
-                std::cout << "*";
-            }
-
-        }
-        std::cout << "\n";
-    }
+    hangmanword = gameReset();
 
     while (components > 1)
     {
@@ -108,13 +56,48 @@ int main()
         {
             std::cout << "Winner!\n";
             printLetters(hangmanword);
-            return 0;
+
+            currentGuess = ' ';
+            while (currentGuess != 'y' && currentGuess != 'n')
+            {
+                std::cout << "Play again? (y/n): ";
+                std::cin >> currentGuess;
+                std::cout << "\n";
+            }
+
+            if (currentGuess == 'y')
+            {
+                hangmanword = gameReset();
+            }
+            else
+            {
+                return 0;
+            }
         }
         std::cout << "====================\n";
+
+        if (components == 1)
+        {
+            std::cout << "\n\n\nYou lost!\n";
+            printHangman(components);
+            std::cout << "Word was: " << hangmanword << "\n";
+
+            currentGuess = ' ';
+            while (currentGuess != 'y' && currentGuess != 'n')
+            {
+                std::cout << "Play again? (y/n): ";
+                std::cin >> currentGuess;
+                std::cout << "\n";
+            }
+
+            if (currentGuess == 'y')
+            {
+                hangmanword = gameReset();
+            }
+        }
     }
 
-    std::cout << "\n\n\nYou lost!\n";
-    printHangman(components);
+    
     return 0;
 }
 
@@ -258,6 +241,80 @@ std::string findInFile(int index)
     {
         return "";
     }
+}
+
+std::string gameReset()
+{
+    components = 10;
+    char currentGuess = ' ';
+    totalGuesses = 0;
+    correctGuesses = 0;
+    std::fill(allGuesses, allGuesses + 26, ' ');
+    std::fill(lettersGuessed, lettersGuessed + 26, 0);
+
+    return getWord();
+}
+
+std::string getWord()
+{
+    char input = ' ';
+    std::string hangmanword;
+
+    while (input != 'y' && input != 'n')
+    {
+        std::cout << "Play against randomly generated word? (y/n): ";
+        std::cin >> input;
+        std::cout << "\n";
+    }
+
+    /* randomly generated word */
+    if (input == 'y')
+    {
+        std::random_device dev;
+        std::mt19937 rng(dev());
+        std::uniform_int_distribution<std::mt19937::result_type> distW(1, 370103);
+
+        hangmanword = findInFile(distW(rng));
+
+        if (hangmanword == "")
+        {
+            std::cout << "File error! Whoopsie.\n";
+            return "";
+        }
+    }
+    /* manually entering a word */
+    else
+    {
+        std::cout << "Please enter a word (max 26 letters): ";
+        char l;
+        while (l = _getch())
+        {
+            /* checking for user to hit enter (ASCII value 13) */
+            if (l == 13)
+            {
+                break;
+            }
+
+            /* checking for backspace */
+            if (l == 8)
+            {
+                std::cout << "\nCannot undo! Please retype the full word: ";
+                hangmanword = "";
+                continue;
+            }
+
+            /* ensuring user has entered a lower case letter */
+            if (l >= 97 && l <= 122)
+            {
+                hangmanword = hangmanword + l;
+                std::cout << "*";
+            }
+
+        }
+        std::cout << "\n";
+    }
+
+    return hangmanword;
 }
 
 /* puts all of the structs from hangmanheader.h into a list hangmanArt 
