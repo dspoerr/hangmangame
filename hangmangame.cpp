@@ -1,6 +1,7 @@
 /*
  * This is a short program to make a console version of hangman with a visual element.
- * Case sensitive. 
+ * Able to be played with a randomly generated word.
+ * Due to conio.h (_getch function), only compiles within Windows.
  * 
  * Text file words_alpha.txt sourced from https://github.com/dwyl/english-words
  */
@@ -13,28 +14,13 @@
 #include <fstream>
 #include <algorithm>
 
-void validateGuess(char, std::string);
-void printLetters(std::string);
-void printHangman(int);
-void printGuesses(void);
-void hangmanheader_init(void);
-std::string gameReset(void);
-std::string getWord(void);
-std::string findInFile(int index);
-
-char allGuesses[26];
-int totalGuesses, correctGuesses;
-int components;
-bool lettersGuessed[26];
-
 
 int main()
 {
-    hangmanheader_init();
-
     std::string hangmanword;
     char currentGuess = ' ';
-    
+
+    hangmanheader_init();
     hangmanword = gameReset();
 
     while (components > 1)
@@ -45,7 +31,6 @@ int main()
         printGuesses();
 
         std::cout << "Please enter a letter: ";
-
 
         std::cin >> currentGuess;
         std::cout << "\n";
@@ -96,10 +81,9 @@ int main()
             }
         }
     }
-
-    
     return 0;
 }
+
 
 /* validates whether the player guessed a correct or valid letter */
 void validateGuess(char currentGuess, std::string hangmanword)
@@ -108,7 +92,7 @@ void validateGuess(char currentGuess, std::string hangmanword)
     /* check if player has already guessed this letter */
     for (int i = 0; i < totalGuesses; i++)
     {
-        if (currentGuess == allGuesses[i])
+        if (currentGuess == prevGuesses[i])
         {
             std::cout << "You already guessed this letter! Try again: ";
             std::cin >> currentGuess;
@@ -117,7 +101,7 @@ void validateGuess(char currentGuess, std::string hangmanword)
         }
     }
     /* if not, add to the list of guesses already made for future verification */
-    allGuesses[totalGuesses] = currentGuess;
+    prevGuesses[totalGuesses] = currentGuess;
     totalGuesses++;
 
     /* verify if the guess is in the word */
@@ -126,7 +110,7 @@ void validateGuess(char currentGuess, std::string hangmanword)
     {
         if (currentGuess == letter)
         {
-            lettersGuessed[j] = true; /* used for printLetters() */
+            posOfCorrectGuesses[j] = true; /* used for printLetters() */
             isCorrect = true; 
             correctGuesses++; /* determines whether the entire word has been guessed */
         }
@@ -136,9 +120,8 @@ void validateGuess(char currentGuess, std::string hangmanword)
     /* player has one less chance to guess correctly */
     if (!isCorrect)
     {
-        components--;
+        components-=difficulty;
     }
-
 }
 
 
@@ -150,7 +133,7 @@ void printLetters(std::string hangmanword)
     int j = 0;
     for (auto& ch : hangmanword)
     {
-        if (lettersGuessed[j] == true)
+        if (posOfCorrectGuesses[j] == true)
         {
             std::cout << ch << "  ";
         }
@@ -178,7 +161,7 @@ void printGuesses()
 
     for (int i = 0; i < totalGuesses; i++)
     {
-        std::cout << allGuesses[i];
+        std::cout << prevGuesses[i];
 
         if (i < (totalGuesses - 1))
         {
@@ -193,7 +176,7 @@ void printHangman(int wrongGuesses)
 {
     /* TODO: clean up the logic here */
     int i = 1;
-    std::cout << "Mistakes remaining: " << wrongGuesses - 1 << "\n";
+    std::cout << "Mistakes remaining: " << (wrongGuesses - 1)/difficulty << "\n";
 
     for (auto& art : hangmanArt)
     {
@@ -210,8 +193,6 @@ void printHangman(int wrongGuesses)
         }
         i++;
     }
-
-
 }
 
 
@@ -243,17 +224,19 @@ std::string findInFile(int index)
     }
 }
 
+
 std::string gameReset()
 {
     components = 10;
     char currentGuess = ' ';
     totalGuesses = 0;
     correctGuesses = 0;
-    std::fill(allGuesses, allGuesses + 26, ' ');
-    std::fill(lettersGuessed, lettersGuessed + 26, 0);
+    std::fill(prevGuesses, prevGuesses + 26, ' ');
+    std::fill(posOfCorrectGuesses, posOfCorrectGuesses + 26, 0);
 
     return getWord();
 }
+
 
 std::string getWord()
 {
@@ -309,27 +292,25 @@ std::string getWord()
                 hangmanword = hangmanword + l;
                 std::cout << "*";
             }
-
         }
         std::cout << "\n";
     }
 
-    return hangmanword;
-}
+    while (input != 'e' && input != 'h')
+    {
+        std::cout << "Difficulty easy (e) or hard (h)? : ";
+        std::cin >> input;
+        std::cout << "\n";
+    }
 
-/* puts all of the structs from hangmanheader.h into a list hangmanArt 
- * done in order to reduce the length of printHangman()
- */
-void hangmanheader_init()
-{
-    hangmanArt.push_back(hangman_ten);
-    hangmanArt.push_back(hangman_nine);
-    hangmanArt.push_back(hangman_eight);
-    hangmanArt.push_back(hangman_seven);
-    hangmanArt.push_back(hangman_six);
-    hangmanArt.push_back(hangman_five);
-    hangmanArt.push_back(hangman_four);
-    hangmanArt.push_back(hangman_three);
-    hangmanArt.push_back(hangman_two);
-    hangmanArt.push_back(hangman_one);
+    if (input == 'e')
+    {
+        difficulty = 1;
+    }
+    else
+    {
+        difficulty = 3;
+    }
+
+    return hangmanword;
 }
