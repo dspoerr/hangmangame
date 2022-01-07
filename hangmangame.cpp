@@ -1,60 +1,93 @@
 /*
  * This is a short program to make a console version of hangman with a visual element.
  * Case sensitive. 
+ * 
+ * Text file words_alpha.txt sourced from https://github.com/dwyl/english-words
  */
 
 #include <iostream>
 #include <conio.h>
 #include <string>
 #include "hangmanheader.h"
+#include <random>
+#include <fstream>
 
 void validateGuess(char, std::string);
 void printLetters(std::string);
 void printHangman(int);
 void printGuesses(void);
 void hangmanheader_init(void);
+std::string findInFile(int index);
 
 char allGuesses[26];
 int totalGuesses, correctGuesses;
 int components;
 bool lettersGuessed[26];
 
+
+/* TODO: add play again */
 int main()
 {
     hangmanheader_init();
 
     std::string hangmanword;
     components = 10;
-    char currentGuess;
+    char currentGuess = ' ';
     totalGuesses = 0;
-
-    std::cout << "Please enter a word (max 26 letters): ";
-    char l;
-    while (l = _getch())
+    
+    while (currentGuess != 'y' && currentGuess != 'n')
     {
-        /* checking for user to hit enter (ASCII value 13) */
-        if (l == 13)
-        {
-            break;
-        }
-
-        /* checking for backspace */
-        if (l == 8)
-        {
-            std::cout << "\nCannot undo! Please retype the full word: ";
-            hangmanword = "";
-            continue;
-        }
-
-        /* ensuring user has entered a lower case letter */
-        if (l >= 97 && l <= 122)
-        {
-            hangmanword = hangmanword + l;
-            std::cout << "*";
-        }
-
+        std::cout << "Play against randomly generated word? (y/n): ";
+        std::cin >> currentGuess;
+        std::cout << "\n";
     }
-    std::cout << "\n";
+    
+    /* randomly generated word */
+    if (currentGuess == 'y')
+    {
+        std::random_device dev;
+        std::mt19937 rng(dev());
+        std::uniform_int_distribution<std::mt19937::result_type> distW(1, 370103);
+
+        hangmanword = findInFile(distW(rng));
+
+        if (hangmanword == "")
+        {
+            std::cout << "File error! Whoopsie.\n";
+            return 0;
+        }
+    }
+    /* manually entering a word */
+    else
+    {
+        std::cout << "Please enter a word (max 26 letters): ";
+        char l;
+        while (l = _getch())
+        {
+            /* checking for user to hit enter (ASCII value 13) */
+            if (l == 13)
+            {
+                break;
+            }
+
+            /* checking for backspace */
+            if (l == 8)
+            {
+                std::cout << "\nCannot undo! Please retype the full word: ";
+                hangmanword = "";
+                continue;
+            }
+
+            /* ensuring user has entered a lower case letter */
+            if (l >= 97 && l <= 122)
+            {
+                hangmanword = hangmanword + l;
+                std::cout << "*";
+            }
+
+        }
+        std::cout << "\n";
+    }
 
     while (components > 1)
     {
@@ -125,6 +158,7 @@ void validateGuess(char currentGuess, std::string hangmanword)
 
 }
 
+
 /* prints all of the guessed letters of the hangman word. 
  * if not yet guessed, prints an 'X'
  */
@@ -171,6 +205,7 @@ void printGuesses()
     std::cout << "\n";
 }
 
+
 void printHangman(int wrongGuesses)
 {
     /* TODO: clean up the logic here */
@@ -179,6 +214,7 @@ void printHangman(int wrongGuesses)
 
     for (auto& art : hangmanArt)
     {
+        /* without this, does not seem to print on loss */
         if (wrongGuesses == 0)
         {
             art.print();
@@ -195,6 +231,38 @@ void printHangman(int wrongGuesses)
 
 }
 
+
+std::string findInFile(int index)
+{
+    int j = 0;
+    std::string val;
+    std::ifstream data;
+    data.open("words_alpha.txt"); /* TODO: make constant */
+
+    if (!data.good())
+    {
+        std::cout << "File cannot be opened.\n";
+        return "";
+    }
+
+    while (j <= index && data.good())
+    {
+        data >> val;
+        j++;
+    }
+    if (data.good())
+    {
+        return val;
+    }
+    else
+    {
+        return "";
+    }
+}
+
+/* puts all of the structs from hangmanheader.h into a list hangmanArt 
+ * done in order to reduce the length of printHangman()
+ */
 void hangmanheader_init()
 {
     hangmanArt.push_back(hangman_ten);
